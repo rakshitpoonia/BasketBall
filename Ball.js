@@ -1,13 +1,14 @@
 class Ball{
 constructor(x,y){
     var options={
-        'restitution':1.0,
+        'restitution':0.8,
         'friction':0.3,
         'density':0.5
     }
     this.body=Bodies.rectangle(x,y,50,50,options);
-    this.height=50
+    this.height=50;
     this.width=50;
+    
     
     World.add(world,this.body);
     this.image=loadImage('basketball.png');
@@ -16,6 +17,8 @@ constructor(x,y){
 display(){
     push();
     var angle=this.body.angle;
+    //this.body.position.x=mouseX;
+   //this.body.position.y=mouseY;
     translate(this.body.position.x,this.body.position.y);
     rotate(angle);
     imageMode(CENTER);
