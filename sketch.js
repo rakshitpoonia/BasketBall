@@ -1,23 +1,29 @@
+//constant variable
 const Bodies=Matter.Bodies;
 const World=Matter.World;
 const Engine=Matter.Engine;
 const Constraint=Matter.Constraint;
 
-var engine,world,ball,ground,launcher,stand,ballimg,background,basket,ball1,ball2,ball3,ball4,ball5,ball6,ball7,ball8,ball9;
+//in game variables
+var engine,world,ball,ground,launcher,stand,ballimg,background,basket,ball1,ball2,ball3,
+ball4,ball5,ball6,ball7,ball8,ball9;
 var balls=[],index=0;
-var basket1,basket2,basket3,celebration,basket4,restart,restartimg;
+var basket1,basket2,basket3,celebration,basket4,basket5;
 var score=0;
 var gameState="attached";
 var Ball1X = 150;
 var maxChances = 10;
 
+//loading images and sound
 function preload(){
 sound1=loadSound("bounce.mp3");
 celebration=loadSound("nice shot.mp3");
 ballimg=loadImage("basketball.png");
-restartimg=loadImage("restart1.png");
 backgroundimg=loadImage("background.png");
+stand=loadImage("stand1.png");
 }
+
+//declaring class variables, creating engine and canvas
 function setup() {
   createCanvas(windowWidth,windowHeight);
   engine=Engine.create();
@@ -29,102 +35,82 @@ function setup() {
    basket1=new Basket(displayWidth-865,displayHeight-550,20,30);
    basket2=new Basket(displayWidth-880,displayHeight-500,10,35);
    basket3=new Basket(displayWidth-997,displayHeight-520 ,10,30);
-   basket4=new Basket(displayWidth-873,displayHeight-515 ,10,25)
-   
+   basket4=new Basket(displayWidth-873,displayHeight-515 ,10,25);
+   basket5=new Basket(displayWidth-1074,displayHeight-350,20,100);
   sprites();
 }
+
+//function for ball sprites
 function sprites(){
   for (var i=0; i < maxChances-1; i++){
     balls[i] = createSprite(displayWidth-(Ball1X+(i*80)),displayHeight-196,50,50);
     balls[i].addImage("ball"+i,ballimg);  
   }
-  /*ball1=createSprite(displayWidth-150,displayHeight-196,50,50);
-  ball2=createSprite(displayWidth-230,displayHeight-196,50,50);
-  ball3=createSprite(displayWidth-310,displayHeight-196,50,50);
-  ball4=createSprite(displayWidth-390,displayHeight-196,50,50);
-  ball5=createSprite(displayWidth-470,displayHeight-196,50,50); 
-  ball6=createSprite(displayWidth-550,displayHeight-196,50,50);
-  ball7=createSprite(displayWidth-630,displayHeight-196,50,50);
-  ball8=createSprite(displayWidth-710,displayHeight-196,50,50);
-  ball9=createSprite(displayWidth-790,displayHeight-196,50,50);
-  balls=[ball1,ball2,ball3,ball4,ball5,ball6,ball7,ball8,ball9];   
-  
-  ball1.addImage("ball1",ballimg);
-  ball2.addImage("ball2",ballimg);
-  ball3.addImage("ball3",ballimg);
-  ball4.addImage("ball4",ballimg);
-  ball5.addImage("ball5",ballimg);
-  ball6.addImage("ball6",ballimg);
-  ball7.addImage("ball7",ballimg);
-  ball8.addImage("ball8",ballimg);
-  ball9.addImage("ball9",ballimg);
-  
-  */
 }
 
+// conditions, sprites and display setup
 function draw() {
   background(backgroundimg);
   stroke("white");
   strokeWeight(3);
   textSize(30);
   textStyle(BOLD);
-  if ((ball.body.position.x>412 && ball.body.position.x<480) 
-  && (ball.body.position.y>258 && ball.body.position.y<324) ){
+
+  //gameState formation and score system
+  if ((ball.body.position.x>displayWidth-954 && ball.body.position.x<displayWidth-886) 
+  && (ball.body.position.y>displayHeight-510 && ball.body.position.y<displayHeight-444) ){
     score=score+5;
     gameState="win";
-  }
-
- 
-  text("Score : "+score,displayWidth-400,displayHeight-700);
-
-  if(ball.body.position.y>=displayHeight-310){
-    gameState="onground";
-  }
-  if(ball.body.position.y>displayHeight || ball.body.position.x>displayWidth || ball.body.position.y<displayHeight-950){
-    gameState="outofscreen";
     
   }
+
+ //score display
+  text("Score : "+score,displayWidth-400,displayHeight-700);
+
+  //gameState formation1
+  if(ball.body.position.y>=displayHeight-315){
+    gameState="onground";
+  }
+
+  //gameState formation2
+  if(ball.body.position.x>displayWidth || ball.body.position.y<displayHeight-950 || ball.body.position.x<displayWidth-1300){
+    gameState="outofscreen";
+  }
+
+  //reset condition
   if (gameState=="onground" || gameState=="outofscreen"){
     textSize(40);
     textAlign(CENTER);
     text("Press space key for more chances",displayWidth-700,displayHeight-400);
   }
+
+  // game over condition
   if (index>(maxChances-2)){
     textSize(40);
     text("Game Over",displayWidth-700,displayHeight-400);
-    restart=createSprite(displayWidth-600,displayHeight-490,30,30);
-    restart.scale=1.0;
-    restart.addImage("restart",restartimg);
+    text("Your total score is: "+score,displayWidth-700,displayHeight-360);
   }
   
-  
-  if (round(ball.body.position.y)>=465){
+  //sound conditions
+  if (round(ball.body.position.y)==displayHeight-315 || round(ball.body.position.y)==displayHeight-316){
     sound1.play();
   }else{
     sound1.pause();
   }
-  if (ball.body.speed<2){
+  if (ball.body.speed<4){
     sound1.pause();
   }
-  if (gameState=="win"){
+
+  // play celebration sound
+  if (gameState=="win" && round(ball.body.position.y)>displayHeight-458){
     celebration.play();
+    gameState="onground";
   }
   else{
     celebration.pause();
   }
-  if(mousePressedOver(restart)){
-    
-    reset();
-    
-    //console.log("replay");
-  }
-
-  //console.log("x "+basket4.body.position.x,"y "+basket4.body.position.y);
   
- 
-//console.log("x "+ball.body.position.x,"y "+ball.body.position.y);
-  
-  
+  //display system
   Engine.update(engine);  
   ball.display();
   ground.display();
@@ -133,18 +119,21 @@ function draw() {
   basket1.display();
   basket2.display();
   basket3.display();
- 
+  basket4.display();
+  basket5.display();
   drawSprites();
 }
+
+// extra functions
 function mouseDragged(){
   if(index>(maxChances-2)){
     return false;
   }
   if (gameState=="attached"){
   Matter.Body.setPosition(ball.body,{x:mouseX,y:mouseY});
-
   }
 }
+
 function mouseReleased(){
   if (index>(maxChances-2)){
     return false;
@@ -152,29 +141,18 @@ function mouseReleased(){
   launcher.fly();
   gameState="launched";
 } 
+
+// space bar reset to launch next ball
 function keyPressed(){
-  //console.log("key press before condition");
   if((keyCode === 32 && gameState=="onground") || gameState=="outofscreen"){
     gameState="attached";
-   // console.log("key press after condition:"+index);
     launcher.attach(ball.body);  
       Matter.Body.setPosition(ball.body, {x:displayWidth-200,y:displayHeight-400}); 
-      ballSpriteDestroy(index);
-    //balls[index].destroy();
+      balls[index].destroy();
     index++;
-    
   }
 }
-function reset(){
-  balls=[];
-  gameState="attached";
-  console.log("reset called");
-  index = 0;
-  sprites();
-  score=0;    
-}
+    
 
-function ballSpriteDestroy(ind){
-  //console.log("i am here:"+ind);
-  balls[ind].destroy();
-}
+
+
