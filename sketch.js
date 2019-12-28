@@ -25,7 +25,7 @@ stand=loadImage("stand1.png");
 
 //declaring class variables, creating engine and canvas
 function setup() {
-  createCanvas(windowWidth,windowHeight);
+  createCanvas(displayWidth,displayHeight);
   engine=Engine.create();
   world=engine.world;
    ball=new Ball(displayWidth-200,displayHeight-400);
@@ -129,8 +129,9 @@ function mouseDragged(){
   if(index>(maxChances-2)){
     return false;
   }
-  if (gameState=="attached"){
+  if (gameState=="attached" && touches.length>0){
   Matter.Body.setPosition(ball.body,{x:mouseX,y:mouseY});
+  touches=[];
   }
 }
 
@@ -144,12 +145,13 @@ function mouseReleased(){
 
 // space bar reset to launch next ball
 function keyPressed(){
-  if((keyCode === 32 && gameState=="onground") || gameState=="outofscreen"){
+  if((keyCode === 32 && gameState=="onground" && touches.length>0) || gameState=="outofscreen"){
     gameState="attached";
     launcher.attach(ball.body);  
       Matter.Body.setPosition(ball.body, {x:displayWidth-200,y:displayHeight-400}); 
       balls[index].destroy();
     index++;
+    touches=[];
   }
 }
     
